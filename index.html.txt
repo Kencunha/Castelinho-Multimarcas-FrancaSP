@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CASTELINHO MULTIMARCAS | Carros Usados em Franca - SP</title>
+<meta name="description" content="Revenda de carros usados em Franca-SP. Bom atendimento, transparência e financiamento. Av. Champagnat, 2530.">
+
+<!-- Three.js (3D) -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary: #e30613;
+    --primary-dark: #b00410;
+    --dark: #0d0d0d;
+    --dark-2: #161616;
+    --light: #f4f4f6;
+    --white: #ffffff;
+    --whats: #25D366;
+    --muted: #8a8a8a;
+    --radius: 14px;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    color: var(--dark);
+    background: var(--white);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  img, video { max-width: 100%; display: block; }
+  a { text-decoration: none; color: inherit; }
+  button, input, select, textarea { font-family: inherit; }
+  .container { width: min(1180px, 92%); margin: auto; }
+  section { padding: 90px 0; position: relative; }
+  .bg-light { background: var(--light); }
+  .bg-dark { background: var(--dark); color: var(--white); }
+
+  /* ---------- BOTÕES ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 28px; border-radius: 10px; font-weight: 700; border: none; cursor: pointer;
+    transition: transform .2s, box-shadow .2s, background .2s; font-size: 1rem;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,.25); }
+  .btn-primary { background: var(--primary); color: var(--white); }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-whats { background: var(--whats); color: var(--white); }
+  .btn-outline { border: 2px solid var(--white); color: var(--white); background: transparent; }
+  .btn-dark { background: var(--dark); color: var(--white); }
+
+  /* ---------- HEADER ---------- */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(13,13,13,.85); backdrop-filter: blur(10px);
+    color: var(--white); transition: padding .3s, box-shadow .3s;
+  }
+  header.scrolled { box-shadow: 0 4px 20px rgba(0,0,0,.4); }
+  .header-inner { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; }
+  .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: .5px; }
+  .logo span { color: var(--primary); }
+  nav { display: flex; gap: 24px; }
+  nav a { font-weight: 500; font-size: .95rem; position: relative; }
+  nav a::after {
+    content: ''; position: absolute; left: 0; bottom: -4px; height: 2px; width: 0;
+    background: var(--primary); transition: width .25s;
+  }
+  nav a:hover::after { width: 100%; }
+  .menu-btn { display: none; background: none; border: none; color: var(--white); font-size: 1.8rem; cursor: pointer; }
+
+  /* ---------- HERO COM 3D ---------- */
+  .hero {
+    min-height: 100vh; display: flex; align-items: center;
+    background:
+      radial-gradient(circle at 75% 40%, rgba(227,6,19,.25), transparent 55%),
+      linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+    color: var(--white); padding-top: 100px; overflow: hidden;
+  }
+  .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .tag {
+    display: inline-block; padding: 6px 14px; border-radius: 30px;
+    background: rgba(227,6,19,.15); color: #ff4b55; font-weight: 600; font-size: .85rem; margin-bottom: 18px;
+  }
+  .hero h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.1; margin-bottom: 20px; }
+  .hero h1 span { color: var(--primary); }
+  .hero p { font-size: 1.15rem; color: #cfcfcf; margin-bottom: 30px; max-width: 540px; }
+  .hero-buttons { display: flex; gap: 14px; flex-wrap: wrap; }
+  .rating-pill {
+    margin-top: 30px; display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.08); padding: 10px 18px; border-radius: 30px; font-size: .95rem;
+  }
+  .stars { color: #fbbc04; letter-spacing: 2px; }
+
+  .car-stage {
+    position: relative; height: 480px; border-radius: 24px;
+    background: radial-gradient(circle at center, rgba(255,255,255,.06), rgba(255,255,255,0) 70%);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  #car3d { width: 100%; height: 100%; cursor: grab; }
+  #car3d:active { cursor: grabbing; }
+  .car-controls {
+    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 12px; align-items: center;
+    background: rgba(0,0,0,.6); padding: 10px 16px; border-radius: 30px; backdrop-filter: blur(6px);
+  }
+  .swatch {
+    width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; cursor: pointer;
+    transition: transform .2s;
+  }
+  .swatch:hover, .swatch.active { transform: scale(1.2); }
+  .toggle-rotate {
+    background: none; border: 1px solid rgba(255,255,255,.4); color: #fff;
+    padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: .8rem;
+  }
+  .car-hint {
+    position: absolute; top: 14px; left: 18px; font-size: .8rem; color: #aaa;
+  }
+
+  /* ---------- SECTION TITLES ---------- */
+  .title { text-align: center; margin-bottom: 55px; }
+  .title h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 10px; }
+  .title p { color: var(--muted); max-width: 620px; margin: auto; }
+  .bg-dark .title p { color: #aaa; }
+
+  /* ---------- REVEAL ---------- */
+  .reveal { opacity: 0; transform: translateY(35px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.show { opacity: 1; transform: none; }
+
+  /* ---------- DIFERENCIAIS / CONTADORES ---------- */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+  .stat-card {
+    background: var(--white); border-radius: var(--radius); padding: 32px 24px; text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,.06); transition: transform .3s;
+  }
+  .stat-card:hover { transform: translateY(-8px); }
+  .stat-card .num { font-size: 2.8rem; font-weight: 800; color: var(--primary); }
+  .stat-card .icon { font-size: 2rem; margin-bottom: 8px; }
+  .stat-card p { color: var(--muted); font-weight: 500; }
+
+  /* ---------- VÍDEOS ---------- */
+  .video-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 26px; }
+  .video-main {
+    background: #000; border-radius: var(--radius); overflow: hidden; position: relative;
+    aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;
+  }
+  .video-main video { width: 100%; height: 100%; object-fit: contain; }
+  .video-fallback {
+    position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    color: #aaa; text-align: center; padding: 20px; background: #111;
+  }
+  .video-info { margin-top: 14px; }
+  .video-info h3 { font-size: 1.2rem; }
+  .video-info p { color: var(--muted); font-size: .95rem; }
+  .playlist { display: flex; flex-direction: column; gap: 12px; max-height: 420px; overflow-y: auto; }
+  .play-item {
+    display: flex; gap: 12px; align-items: center; background: var(--white);
+    padding: 10px; border-radius: 12px; cursor: pointer; border: 2px solid transparent;
+    box-shadow: 0 4px 14px rgba(0,0,0,.05); transition: .2s;
+  }
+  .play-item:hover { border-color: var(--primary); }
+  .play-item.active { border-color: var(--primary); background: #fff5f5; }
+  .play-thumb {
+    width: 110px; min-width: 110px; height: 66px; border-radius: 8px; background-size: cover;
+    background-position: center; position: relative;
+  }
+  .play-thumb::after {
+    content: '▶'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 1.4rem; background: rgba(0,0,0,.35); border-radius: 8px;
+  }
+  .play-item strong { font-size: .95rem; display: block; }
+  .play-item small { color: var(--muted); }
+
+  /* ---------- ESTOQUE ---------- */
+  .filters {
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center;
+    margin-bottom: 26px;
+  }
+  .filters input, .filters select {
+    padding: 13px 16px; border: 1px solid #ddd; border-radius: 10px; font-size: .95rem; background: #fff;
+  }
+  .filters input { flex: 1 1 260px; }
+  .filters select { flex: 0 1 200px; }
+  .filters input:focus, .filters select:focus { outline: 2px solid var(--primary); border-color: transparent; }
+  .chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; }
+  .chip {
+    padding: 9px 18px; border-radius: 30px; border: 1px solid #ddd; background: #fff;
+    cursor: pointer; font-weight: 600; font-size: .9rem; transition: .2s;
+  }
+  .chip:hover { border-color: var(--primary); color: var(--primary); }
+  .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .aviso {
+    font-size: .85rem; color: #7a5b00; background: #fff6d6; padding: 10px 14px; border-radius: 8px; margin-bottom: 24px;
+  }
+  .cars-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 26px; }
+  .car-card {
+    background: var(--white); border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 6px 22px rgba(0,0,0,.07); transition: transform .3s, box-shadow .3s;
+    cursor: pointer; animation: fadeUp .5s ease both;
+  }
+  .car-card:hover { transform: translateY(-6px); box-shadow: 0 16px 36px rgba(0,0,0,.14); }
+  .car-img { position: relative; height: 200px; overflow: hidden; }
+  .car-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+  .car-card:hover .car-img img { transform: scale(1.08); }
+  .badge {
+    position: absolute; top: 12px; left: 12px; background: var(--primary); color: #fff;
+    padding: 4px 10px; border-radius: 6px; font-size: .75rem; font-weight: 700;
+  }
+  .car-info { padding: 20px; }
+  .car-info h3 { font-size: 1.1rem; margin-bottom: 4px; }
+  .car-meta { color: var(--muted); font-size: .88rem; margin-bottom: 12px; }
+  .car-price { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; }
+  .car-info .btn { width: 100%; padding: 11px; font-size: .95rem; }
+  .empty { grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- MODAL ---------- */
+  .modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 2000;
+    display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px);
+  }
+  .modal.open { display: flex; animation: fadeIn .3s; }
+  .modal-box {
+    background: #fff; border-radius: 18px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto;
+    position: relative; animation: pop .35s ease;
+  }
+  .modal-close {
+    position: absolute; top: 12px; right: 14px; z-index: 5; background: #fff; border: none;
+    width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,.2);
+  }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  .gallery img { width: 100%; height: 100%; min-height: 320px; object-fit: cover; }
+  .modal-details { padding: 30px; }
+  .modal-details h3 { font-size: 1.5rem; margin-bottom: 6px; }
+  .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+  .spec { background: var(--light); padding: 12px; border-radius: 10px; font-size: .9rem; }
+  .spec strong { display: block; color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; }
+  .modal-details .car-price { font-size: 1.8rem; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  /* ---------- SIMULADOR ---------- */
+  .sim-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+  .sim-field { margin-bottom: 24px; }
+  .sim-field label { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 8px; }
+  .sim-field label span { color: var(--primary); }
+  input[type=range] { width: 100%; accent-color: var(--primary); cursor: pointer; }
+  .sim-result {
+    background: var(--dark-2); border-radius: 18px; padding: 36px; text-align: center;
+    border: 1px solid rgba(227,6,19,.4); box-shadow: 0 0 40px rgba(227,6,19,.15);
+  }
+  .sim-result small { color: #aaa; }
+  .sim-result .parcela { font-size: 3rem; font-weight: 800; color: var(--primary); margin: 8px 0; }
+  .sim-result .detalhes { color: #ccc; font-size: .95rem; margin-bottom: 22px; }
+  .sim-note { font-size: .8rem; color: #777; margin-top: 16px; }
+
+  /* ---------- AVALIAÇÕES ---------- */
+  .carousel { position: relative; max-width: 760px; margin: auto; }
+  .review-slide {
+    display: none; background: var(--white); padding: 40px; border-radius: 18px;
+    box-shadow: 0 10px 35px rgba(0,0,0,.08); text-align: center; animation: fadeUp .6s ease;
+  }
+  .review-slide.active { display: block; }
+  .review-slide p { font-size: 1.1rem; font-style: italic; color: #444; margin: 16px 0; }
+  .review-slide small { color: var(--muted); font-weight: 600; }
+  .dots { display: flex; justify-content: center; gap: 10px; margin-top: 24px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: #ccc; cursor: pointer; transition: .3s; }
+  .dot.active { background: var(--primary); transform: scale(1.25); }
+  .google-score { text-align: center; margin-top: 30px; color: var(--muted); }
+
+  /* ---------- CONTATO ---------- */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  .info-item { display: flex; gap: 14px; margin-bottom: 22px; }
+  .info-item .ico {
+    width: 46px; height: 46px; min-width: 46px; border-radius: 12px; background: var(--primary);
+    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  }
+  .info-item h4 { margin-bottom: 2px; }
+  .info-item p, .info-item a { color: #555; }
+  form.lead { display: grid; gap: 14px; background: #fff; padding: 30px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.06); }
+  form.lead input, form.lead select, form.lead textarea {
+    width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem;
+  }
+  form.lead input:focus, form.lead select:focus, form.lead textarea:focus { outline: 2px solid var(--primary); border-color: transparent; }
+  .map { width: 100%; height: 100%; min-height: 380px; border: 0; border-radius: 18px; }
+
+  /* ---------- FOOTER / FLOATS ---------- */
+  footer { background: #080808; color: #888; text-align: center; padding: 36px 0; font-size: .9rem; }
+  footer strong { color: #fff; }
+  .whats-float {
+    position: fixed; bottom: 24px; right: 24px; z-index: 900; width: 62px; height: 62px; border-radius: 50%;
+    background: var(--whats); color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 1.9rem; box-shadow: 0 6px 20px rgba(0,0,0,.3); animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(37,211,102,.6); }
+    70% { box-shadow: 0 0 0 16px rgba(37,211,102,0); }
+    100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
+  }
+  .to-top {
+    position: fixed; bottom: 24px; left: 24px; z-index: 900; width: 46px; height: 46px; border-radius: 50%;
+    background: var(--dark); color: #fff; border: none; cursor: pointer; font-size: 1.2rem;
+    opacity: 0; pointer-events: none; transition: .3s;
+  }
+  .to-top.show { opacity: 1; pointer-events: auto; }
+
+  /* ---------- RESPONSIVO ---------- */
+  @media (max-width: 900px) {
+    .hero-grid, .video-layout, .sim-grid, .contact-grid, .modal-grid { grid-template-columns: 1fr; }
+    .car-stage { height: 380px; }
+    .gallery img { min-height: 240px; }
+  }
+  @media (max-width: 768px) {
+    nav {
+      position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0;
+      background: var(--dark); display: none; padding: 10px 0;
+    }
+    nav.open { display: flex; }
+    nav a { padding: 14px 6%; border-top: 1px solid #222; }
+    nav a::after { display: none; }
+    .menu-btn { display: block; }
+    section { padding: 70px 0; }
+    .specs { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header id="header">
+  <div class="container header-inner">
+    <a href="#inicio" class="logo">CASTELINHO <span>MULTIMARCAS</span></a>
+    <nav id="nav">
+      <a href="#diferenciais">Diferenciais</a>
+      <a href="#videos">Vídeos</a>
+      <a href="#estoque">Estoque</a>
+      <a href="#simulador">Financiamento</a>
+      <a href="#avaliacoes">Avaliações</a>
+      <a href="#contato">Contato</a>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">☰</button>
+  </div>
+</header>
+
+<!-- ============ HERO COM 3D ============ -->
+<section class="hero" id="inicio">
+  <div class="container hero-grid">
+    <div>
+      <span class="tag">Revenda de veículos usados • Franca - SP</span>
+      <h1>Seu próximo carro usado<br>com <span>confiança</span></h1>
+      <p>Bom atendimento, transparência em cada negociação e facilidades de financiamento. Gire o carro ao lado e escolha a cor!</p>
+      <div class="hero-buttons">
+        <a href="#estoque" class="btn btn-primary">Ver estoque</a>
+        <a href="https://wa.me/5516993191038?text=Olá! Vi o site da Castelinho Multimarcas e quero mais informações." target="_blank" class="btn btn-whats">📱 WhatsApp</a>
+      </div>
+      <div class="rating-pill">
+        <span class="stars">★★★★★</span>
+        <strong>5,0</strong> no Google
+      </div>
+    </div>
+
+    <div class="car-stage">
+      <div class="car-hint">Arraste para girar • Scroll para zoom</div>
+      <div id="car3d"></div>
+      <div class="car-controls">
+        <div class="swatch active" style="background:#e30613" data-color="#e30613" title="Vermelho"></div>
+        <div class="swatch" style="background:#1d4ed8" data-color="#1d4ed8" title="Azul"></div>
+        <div class="swatch" style="background:#e5e7eb" data-color="#e5e7eb" title="Branco"></div>
+        <div class="swatch" style="background:#111827" data-color="#111827" title="Preto"></div>
+        <div class="swatch" style="background:#9ca3af" data-color="#9ca3af" title="Prata"></div>
+        <button class="toggle-rotate" id="toggleRotate">⏸ Pausar giro</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIFERENCIAIS ============ -->
+<section id="diferenciais">
+  <div class="container">
+    <div class="title reveal">
+      <h2>Por que escolher a Castelinho?</h2>
+      <p>Compromisso com você do primeiro contato até a entrega das chaves</p>
+    </div>
+    <div class="stats">
+      <div class="stat-card reveal">
+        <div class="icon">🤝</div>
+        <div class="num"><span class="counter" data-target="5" data-decimals="1">0</span></div>
+        <p>Nota média no Google</p>
+      </div>
+      <div class="stat-card reveal">
+        <div class="icon">🔍</div>
+        <div class="num">100%</div>
+        <p>Transparência nas informações do veículo</p>
+      </div>
+      <div class="stat-card reveal">
+        <div class="icon">💳</div>
+        <div class="num">Fácil</div>
+        <p>Trabalhamos com compra e financiamento</p>
+      </div>
+      <div class="stat-card reveal">
+        <div class="icon">📍</div>
+        <div class="num">Franca</div>
+        <p>Av. Champagnat, 2530 - Centro</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VÍDEOS ============ -->
+<section id="videos" class="bg-dark">
+  <div class="container">
+    <div class="title reveal">
+      <h2>Conheça a loja em vídeo</h2>
+      <p>Tour pelo pátio, dicas de compra e bastidores da Castelinho</p>
+    </div>
+    <div class="video-layout reveal">
+      <div>
+        <div class="video-main">
+          <video id="mainVideo" controls playsinline preload="metadata"></video>
+          <div class="video-fallback" id="videoFallback">
+            Vídeo não encontrado. Coloque o arquivo na pasta <strong>&nbsp;videos/&nbsp;</strong> com o nome indicado na playlist.
+          </div>
+        </div>
+        <div class="video-info">
+          <h3 id="videoTitle"></h3>
+          <p id="videoDesc"></p>
+        </div>
+      </div>
+      <div class="playlist" id="playlist"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ESTOQUE ============ -->
+<section id="estoque" class="bg-light">
+  <div class="container">
+    <div class="title reveal">
+      <h2>Nosso estoque</h2>
+      <p>Filtre por marca, tipo ou busque pelo modelo. Clique em um veículo para ver os detalhes.</p>
+    </div>
+
+    <div class="aviso">⚠️ [AJUSTE] Os veículos abaixo são exemplos. Substitua pelo estoque real da loja.</div>
+
+    <div class="filters">
+      <input type="text" id="busca" placeholder="🔎 Buscar modelo ou marca...">
+      <select id="marca"><option value="">Todas as marcas</option></select>
+      <select id="ordenar">
+        <option value="relevancia">Ordenar: relevância</option>
+        <option value="menor">Menor preço</option>
+        <option value="maior">Maior preço</option>
+        <option value="km">Menor quilometragem</option>
+        <option value="ano">Mais novo</option>
+      </select>
+    </div>
+
+    <div class="chips" id="chips">
+      <button class="chip active" data-tipo="">Todos</button>
+      <button class="chip" data-tipo="hatch">Hatch</button>
+      <button class="chip" data-tipo="sedan">Sedan</button>
+      <button class="chip" data-tipo="suv">SUV</button>
+      <button class="chip" data-tipo="picape">Picape</button>
+    </div>
+
+    <div class="cars-grid" id="carsGrid"></div>
+  </div>
+</section>
+
+<!-- MODAL DO VEÍCULO -->
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose" aria-label="Fechar">&times;</button>
+    <div class="modal-grid" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ============ SIMULADOR ============ -->
+<section id="simulador" class="bg-dark">
+  <div class="container">
+    <div class="title reveal">
+      <h2>Simule seu financiamento</h2>
+      <p>Ajuste os valores e veja a parcela estimada em tempo real</p>
+    </div>
+    <div class="sim-grid reveal">
+      <div>
+        <div class="sim-field">
+          <label>Valor do veículo <span id="vValor"></span></label>
+          <input type="range" id="sValor" min="20000" max="200000" step="1000" value="80000">
+        </div>
+        <div class="sim-field">
+          <label>Entrada <span id="vEntrada"></span></label>
+          <input type="range" id="sEntrada" min="0" max="60" step="5" value="20">
+        </div>
+        <div class="sim-field">
+          <label>Prazo <span id="vPrazo"></span></label>
+          <input type="range" id="sPrazo" min="12" max="72" step="6" value="48">
+        </div>
+        <div class="sim-field">
+          <label>Taxa de juros ao mês <span id="vTaxa"></span></label>
+          <input type="range" id="sTaxa" min="0.5" max="3.5" step="0.01" value="1.89">
+        </div>
+      </div>
+      <div class="sim-result">
+        <small>Parcela estimada</small>
+        <div class="parcela" id="resParcela">R$ 0</div>
+        <div class="detalhes" id="resDetalhes"></div>
+        <a href="#contato" class="btn btn-primary" id="resBtn">Quero essa condição</a>
+        <p class="sim-note">[AJUSTE] Valores ilustrativos. A taxa real depende de análise de crédito e da instituição financeira.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AVALIAÇÕES ============ -->
+<section id="avaliacoes">
+  <div class="container">
+    <div class="title reveal">
+      <h2>O que nossos clientes dizem</h2>
+      <p>Nota 5,0 no Google</p>
+    </div>
+    <div class="carousel reveal" id="carousel">
+      <!-- [AJUSTE] Troque pelos depoimentos reais dos clientes (com autorização) -->
+      <div class="review-slide active">
+        <div class="stars">★★★★★</div>
+        <p>"[Depoimento real do cliente sobre o atendimento]"</p>
+        <small>— [Nome do cliente]</small>
+      </div>
+      <div class="review-slide">
+        <div class="stars">★★★★★</div>
+        <p>"[Depoimento real do cliente sobre a compra ou financiamento]"</p>
+        <small>— [Nome do cliente]</small>
+      </div>
+      <div class="review-slide">
+        <div class="stars">★★★★★</div>
+        <p>"[Depoimento real do cliente sobre a transparência]"</p>
+        <small>— [Nome do cliente]</small>
+      </div>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div class="google-score">Avaliado no Google com nota 5,0</div>
+  </div>
+</section>
+
+<!-- ============ CONTATO ============ -->
+<section id="contato" class="bg-light">
+  <div class="container contact-grid">
+    <div class="reveal">
+      <div class="title" style="text-align:left; margin-bottom:30px;">
+        <h2>Visite nossa loja</h2>
+        <p>Estamos prontos para te atender</p>
+      </div>
+      <div class="info-item">
+        <div class="ico">📍</div>
+        <div><h4>Endereço</h4><p>Av. Champagnat, 2530 - Centro<br>Franca - SP, 14403-050</p></div>
+      </div>
+      <div class="info-item">
+        <div class="ico">📞</div>
+        <div><h4>Telefone / WhatsApp</h4><a href="https://wa.me/5516993191038" target="_blank">(16) 99319-1038</a></div>
+      </div>
+      <div class="info-item">
+        <div class="ico">🕒</div>
+        <div><h4>Horário</h4><p>[AJUSTE] Seg a Sex: 08h às 18h<br>[AJUSTE] Sábado: 08h às 12h</p></div>
+      </div>
+      <div class="info-item">
+        <div class="ico">📸</div>
+        <div><h4>Instagram</h4><a href="#" target="_blank">[AJUSTE] @seu_instagram</a></div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <form class="lead" id="leadForm">
+        <h3>Fale com um consultor</h3>
+        <input type="text" id="nome" placeholder="Seu nome" required>
+        <input type="tel" id="telefone" placeholder="Seu WhatsApp (com DDD)" required>
+        <select id="assunto" required>
+          <option value="">Tenho interesse em...</option>
+          <option>Comprar um veículo</option>
+          <option>Vender meu veículo</option>
+          <option>Financiamento</option>
+          <option>Outros assuntos</option>
+        </select>
+        <textarea id="mensagem" rows="4" placeholder="Mensagem (opcional)"></textarea>
+        <button type="submit" class="btn btn-whats">📱 Enviar pelo WhatsApp</button>
+      </form>
+      <div style="margin-top:24px;">
+        <iframe class="map"
+          src="https://www.google.com/maps?q=Av.+Champagnat,+2530+-+Centro,+Franca+-+SP,+14403-050&output=embed"
+          loading="lazy" allowfullscreen title="Localização da loja"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <p><strong>CASTELINHO MULTIMARCAS</strong></p>
+    <p>Revenda de veículos usados • Franca - SP</p>
+    <p>© 2025 Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<a href="https://wa.me/5516993191038?text=Olá! Vi o site e quero mais informações." class="whats-float" target="_blank" aria-label="WhatsApp">💬</a>
+<button class="to-top" id="toTop" aria-label="Voltar ao topo">↑</button>
+
+<!-- ============ SCRIPTS ============ -->
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const WHATS = '5516993191038';
+const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+/* ---------- HEADER / MENU ---------- */
+const header = $('#header');
+window.addEventListener('scroll', () => {
+  header.classList.toggle('scrolled', window.scrollY > 40);
+  $('#toTop').classList.toggle('show', window.scrollY > 600);
+});
+$('#menuBtn').addEventListener('click', () => $('#nav').classList.toggle('open'));
+$$('#nav a').forEach(a => a.addEventListener('click', () => $('#nav').classList.remove('open')));
+$('#toTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ---------- REVEAL NO SCROLL ---------- */
+const revealIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('show');
+      e.target.querySelectorAll('.counter').forEach(runCounter);
+      revealIO.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.15 });
+$$('.reveal').forEach(el => revealIO.observe(el));
+
+/* ---------- CONTADORES ---------- */
+function runCounter(el) {
+  if (el.dataset.done) return;
+  el.dataset.done = '1';
+  const target = parseFloat(el.dataset.target);
+  const dec = parseInt(el.dataset.decimals || '0');
+  const dur = 1400, start = performance.now();
+  const step = now => {
+    const p = Math.min((now - start) / dur, 1);
+    const val = target * (1 - Math.pow(1 - p, 3));
+    el.textContent = val.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+/* ---------- 3D: CARRO INTERATIVO ---------- */
+const container = $('#car3d');
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x0d0d0d, 12, 30);
+
+const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+camera.position.set(6.5, 2.6, 7);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+container.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.enablePan = false;
+controls.minDistance = 6;
+controls.maxDistance = 14;
+controls.maxPolarAngle = Math.PI / 2.05;
+controls.target.set(0, 1, 0);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+const key = new THREE.DirectionalLight(0xffffff, 1.6);
+key.position.set(5, 8, 5);
+key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024);
+scene.add(key);
+const rim = new THREE.PointLight(0xe30613, 35, 20);
+rim.position.set(-4, 3, -4);
+scene.add(rim);
+
+const ground = new THREE.Mesh(
+  new THREE.CircleGeometry(9, 64),
+  new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9, metalness: 0.1 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+function buildCar(color) {
+  const car = new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({ color, metalness: 0.7, roughness: 0.22 });
+  const glassMat = new THREE.MeshStandardMaterial({ color: 0x0b1620, metalness: 0.9, roughness: 0.05 });
+  const blackMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.7 });
+  const chromeMat = new THREE.MeshStandardMaterial({ color: 0xcfd6dd, metalness: 1, roughness: 0.15 });
+  const lightMat = new THREE.MeshStandardMaterial({ color: 0xffffee, emissive: 0xffffcc, emissiveIntensity: 1.2 });
+  const tailMat = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 1 });
+
+  const add = (geo, mat, x, y, z, rot = 0) => {
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set(x, y, z);
+    if (rot) m.rotation.z = rot;
+    m.castShadow = true;
+    m.receiveShadow = true;
+    car.add(m);
+    return m;
+  };
+
+  // carroceria inferior
+  add(new THREE.BoxGeometry(4.2, 0.85, 1.9), bodyMat, 0, 0.8, 0);
+  // capô e porta-malas com leve inclinação
+  add(new THREE.BoxGeometry(1.2, 0.2, 1.8), bodyMat, 1.5, 1.2, 0, -0.08);
+  add(new THREE.BoxGeometry(0.9, 0.2, 1.8), bodyMat, -1.6, 1.2, 0, 0.08);
+  // cabine (vidros)
+  add(new THREE.BoxGeometry(2.3, 0.85, 1.72), glassMat, -0.1, 1.67, 0);
+  // teto
+  add(new THREE.BoxGeometry(1.9, 0.12, 1.66), bodyMat, -0.1, 2.15, 0);
+  // para-choque e soleira pretos
+  add(new THREE.BoxGeometry(0.2, 0.35, 1.85), blackMat, 2.12, 0.6, 0);
+  add(new THREE.BoxGeometry(0.2, 0.35, 1.85), blackMat, -2.12, 0.6, 0);
+  // grade e faróis
+  add(new THREE.BoxGeometry(0.06, 0.35, 1.2), chromeMat, 2.12, 0.95, 0);
+  add(new THREE.BoxGeometry(0.06, 0.2, 0.4), lightMat, 2.12, 1.1, 0.62);
+  add(new THREE.BoxGeometry(0.06, 0.2, 0.4), lightMat, 2.12, 1.1, -0.62);
+  // lanternas traseiras
+  add(new THREE.BoxGeometry(0.06, 0.2, 0.4), tailMat, -2.12, 1.1, 0.62);
+  add(new THREE.BoxGeometry(0.06, 0.2, 0.4), tailMat, -2.12, 1.1, -0.62);
+
+  // rodas
+  const wheelGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.34, 28);
+  const rimGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.36, 16);
+  [[1.4, 0.42, 0.98], [1.4, 0.42, -0.98], [-1.4, 0.42, 0.98], [-1.4, 0.42, -0.98]].forEach(([x, y, z]) => {
+    const w = new THREE.Mesh(wheelGeo, blackMat);
+    w.rotation.x = Math.PI / 2;
+    w.position.set(x, y, z);
+    w.castShadow = true;
+    car.add(w);
+    const r = new THREE.Mesh(rimGeo, chromeMat);
+    r.rotation.x = Math.PI / 2;
+    r.position.set(x, y, z);
+    car.add(r);
+  });
+
+  car.userData.bodyMat = bodyMat;
+  car.position.y = 0;
+  return car;
+}
+
+const car = buildCar(0xe30613);
+scene.add(car);
+
+let autoRotate = true;
+$('#toggleRotate').addEventListener('click', e => {
+  autoRotate = !autoRotate;
+  e.target.textContent = autoRotate ? '⏸ Pausar giro' : '▶ Girar';
+});
+$$('.swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    $$('.swatch').forEach(s => s.classList.remove('active'));
+    sw.classList.add('active');
+    car.userData.bodyMat.color.set(sw.dataset.color);
+  });
+});
+
+function resize() {
+  const w = container.clientWidth, h = container.clientHeight;
+  renderer.setSize(w, h, false);
+  renderer.domElement.style.width = '100%';
+  renderer.domElement.style.height = '100%';
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (autoRotate) car.rotation.y += 0.008;
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+/* ---------- VÍDEOS ---------- */
+// [AJUSTE] Troque os nomes dos arquivos e as miniaturas pelos vídeos reais da loja
+const videos = [
+  { titulo: 'Tour pelo pátio da loja', desc: 'Conheça nosso estoque e a estrutura da Castelinho.', src: 'videos/tour-patio.mp4', thumb: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=600&q=70' },
+  { titulo: 'Dicas para comprar carro usado', desc: 'O que verificar antes de fechar negócio.', src: 'videos/dicas-compra.mp4', thumb: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=70' },
+  { titulo: 'Como funciona o financiamento', desc: 'Passo a passo para aprovar seu financiamento.', src: 'videos/financiamento.mp4', thumb: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=600&q=70' }
+];
+const mainVideo = $('#mainVideo');
+const fallback = $('#videoFallback');
+mainVideo.addEventListener('error', () => fallback.style.display = 'flex');
+
+function playVideo(i) {
+  const v = videos[i];
+  fallback.style.display = 'none';
+  mainVideo.src = v.src;
+  mainVideo.poster = v.thumb;
+  $('#videoTitle').textContent = v.titulo;
+  $('#videoDesc').textContent = v.desc;
+  $$('.play-item').forEach((el, idx) => el.classList.toggle('active', idx === i));
+}
+$('#playlist').innerHTML = videos.map((v, i) => `
+  <div class="play-item ${i === 0 ? 'active' : ''}" data-i="${i}">
+    <div class="play-thumb" style="background-image:url('${v.thumb}')"></div>
+    <div><strong>${v.titulo}</strong><small>Vídeo ${i + 1}</small></div>
+  </div>`).join('');
+$$('.play-item').forEach(el => el.addEventListener('click', () => {
+  playVideo(+el.dataset.i);
+  mainVideo.play().catch(() => {});
+  $('#videos .video-main').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}));
+playVideo(0);
+
+/* ---------- ESTOQUE ---------- */
+// [AJUSTE] Dados de exemplo. Troque pelo estoque real.
+const IMG = [
+  'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=900&q=80'
+];
+const estoque = [
+  { id: 1, marca: 'Chevrolet', modelo: 'Onix LT 1.0', ano: 2020, km: 45000, preco: 72900, comb: 'Flex', cambio: 'Automático', tipo: 'hatch', destaque: true, fotos: [IMG[0], IMG[1]] },
+  { id: 2, marca: 'Volkswagen', modelo: 'Polo Track', ano: 2019, km: 60000, preco: 65500, comb: 'Flex', cambio: 'Manual', tipo: 'hatch', fotos: [IMG[1], IMG[2]] },
+  { id: 3, marca: 'Toyota', modelo: 'Corolla XEi 2.0', ano: 2021, km: 30000, preco: 128900, comb: 'Flex', cambio: 'Automático', tipo: 'sedan', destaque: true, fotos: [IMG[2], IMG[0]] },
+  { id: 4, marca: 'Jeep', modelo: 'Renegade Longitude', ano: 2019, km: 55000, preco: 89900, comb: 'Flex', cambio: 'Automático', tipo: 'suv', fotos: [IMG[3], IMG[1]] },
+  { id: 5, marca: 'Fiat', modelo: 'Toro Freedom', ano: 2020, km: 52000, preco: 98500, comb: 'Diesel', cambio: 'Automático', tipo: 'picape', fotos: [IMG[0], IMG[3]] },
+  { id: 6, marca: 'Hyundai', modelo: 'HB20 Comfort', ano: 2018, km: 70000, preco: 52900, comb: 'Flex', cambio: 'Manual', tipo: 'hatch', fotos: [IMG[2], IMG[3]] },
+  { id: 7, marca: 'Honda', modelo: 'HR-V EXL', ano: 2019, km: 48000, preco: 116000, comb: 'Flex', cambio: 'CVT', tipo: 'suv', fotos: [IMG[1], IMG[0]] },
+  { id: 8, marca: 'Chevrolet', modelo: 'S10 LTZ', ano: 2019, km: 80000, preco: 185000, comb: 'Diesel', cambio: 'Automático', tipo: 'picape', destaque: true, fotos: [IMG[3], IMG[2]] }
+];
+
+const grid = $('#carsGrid');
+const busca = $('#busca'), marcaSel = $('#marca'), ordenar = $('#ordenar');
+let tipoAtivo = '';
+
+[...new Set(estoque.map(c => c.marca))].sort().forEach(m => {
+  marcaSel.insertAdjacentHTML('beforeend', `<option value="${m}">${m}</option>`);
+});
+
+function filtrar() {
+  const q = busca.value.trim().toLowerCase();
+  const m = marcaSel.value;
+  let lista = estoque.filter(c =>
+    (!q || `${c.marca} ${c.modelo}`.toLowerCase().includes(q)) &&
+    (!m || c.marca === m) &&
+    (!tipoAtivo || c.tipo === tipoAtivo)
+  );
+  const sorts = {
+    menor: (a, b) => a.preco - b.preco,
+    maior: (a, b) => b.preco - a.preco,
+    km: (a, b) => a.km - b.km,
+    ano: (a, b) => b.ano - a.ano,
+    relevancia: (a, b) => (b.destaque ? 1 : 0) - (a.destaque ? 1 : 0)
+  };
+  lista.sort(sorts[ordenar.value]);
+  renderCars(lista);
+}
+
+function renderCars(lista) {
+  if (!lista.length) {
+    grid.innerHTML = `<div class="empty">Nenhum veículo encontrado com esses filtros.</div>`;
+    return;
+  }
+  grid.innerHTML = lista.map((c, i) => `
+    <div class="car-card" data-id="${c.id}" style="animation-delay:${i * 0.06}s">
+      <div class="car-img">
+        <img src="${c.fotos[0]}" alt="${c.marca} ${c.modelo}" loading="lazy">
+        ${c.destaque ? '<span class="badge">DESTAQUE</span>' : ''}
+      </div>
+      <div class="car-info">
+        <h3>${c.marca} ${c.modelo}</h3>
+        <p class="car-meta">${c.ano} • ${c.km.toLocaleString('pt-BR')} km • ${c.comb} • ${c.cambio}</p>
+        <p class="car-price">${fmt(c.preco)}</p>
+        <button class="btn btn-dark ver-detalhes">Ver detalhes</button>
+      </div>
+    </div>`).join('');
+}
+
+[busca, marcaSel, ordenar].forEach(el => el.addEventListener('input', filtrar));
+$$('#chips .chip').forEach(ch => ch.addEventListener('click', () => {
+  $$('#chips .chip').forEach(c => c.classList.remove('active'));
+  ch.classList.add('active');
+  tipoAtivo = ch.dataset.tipo;
+  filtrar();
+}));
+
+/* ---------- MODAL ---------- */
+const modal = $('#modal');
+function abrirModal(id) {
+  const c = estoque.find(x => x.id === id);
+  if (!c) return;
+  const msg = encodeURIComponent(`Olá! Tenho interesse no ${c.marca} ${c.modelo} (${c.ano}) anunciado no site.`);
+  $('#modalBody').innerHTML = `
+    <div class="gallery"><img src="${c.fotos[0]}" alt="${c.marca} ${c.modelo}" id="mainPhoto"></div>
+    <div class="modal-details">
+      <span class="tag" style="color:#e30613;background:#fde8ea">${c.tipo.toUpperCase()}</span>
+      <h3>${c.marca} ${c.modelo}</h3>
+      <p class="car-price">${fmt(c.preco)}</p>
+      <div class="specs">
+        <div class="spec"><strong>Ano</strong>${c.ano}</div>
+        <div class="spec"><strong>Quilometragem</strong>${c.km.toLocaleString('pt-BR')} km</div>
+        <div class="spec"><strong>Combustível</strong>${c.comb}</div>
+        <div class="spec"><strong>Câmbio</strong>${c.cambio}</div>
+      </div>
+      <p style="color:#666;font-size:.95rem;margin-bottom:20px;">Veículo com procedência e documentação conferidas. Agende uma visita ou fale com um consultor.</p>
+      <a href="https://wa.me/${WHATS}?text=${msg}" target="_blank" class="btn btn-whats" style="width:100%">📱 Tenho interesse</a>
+    </div>`;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  $$('#modalBody .gallery').forEach(() => {});
+  const photo = $('#mainPhoto');
+  let idx = 0;
+  photo.addEventListener('click', () => {
+    idx = (idx + 1) % c.fotos.length;
+    photo.src = c.fotos[idx];
+  });
+}
+function fecharModal() {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+grid.addEventListener('click', e => {
+  const card = e.target.closest('.car-card');
+  if (card) abrirModal(+card.dataset.id);
+});
+$('#modalClose').addEventListener('click', fecharModal);
+modal.addEventListener('click', e => { if (e.target === modal) fecharModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+
+filtrar();
+
+/* ---------- SIMULADOR DE FINANCIAMENTO ---------- */
+const sVal = $('#sValor'), sEnt = $('#sEntrada'), sPraz = $('#sPrazo'), sTax = $('#sTaxa');
+function simular() {
+  const valor = +sVal.value;
+  const entradaPct = +sEnt.value;
+  const entrada = valor * entradaPct / 100;
+  const financiado = valor - entrada;
+  const n = +sPraz.value;
+  const i = +sTax.value / 100;
+  const parcela = i === 0 ? financiado / n : financiado * i / (1 - Math.pow(1 + i, -n));
+  const total = parcela * n;
+
+  $('#vValor').textContent = fmt(valor);
+  $('#vEntrada').textContent = `${entradaPct}% (${fmt(entrada)})`;
+  $('#vPrazo').textContent = `${n} meses`;
+  $('#vTaxa').textContent = `${(+sTax.value).toFixed(2).replace('.', ',')}% a.m.`;
+  $('#resParcela').textContent = `${fmt(parcela)}/mês`;
+  $('#resDetalhes').innerHTML = `Valor financiado: <strong>${fmt(financiado)}</strong><br>Total pago: <strong>${fmt(total)}</strong>`;
+  $('#resBtn').onclick = e => {
+    e.preventDefault();
+    const txt = encodeURIComponent(`Olá! Simulei: veículo ${fmt(valor)}, entrada ${entradaPct}%, ${n}x de ${fmt(parcela)}. Quero saber mais.`);
+    window.open(`https://wa.me/${WHATS}?text=${txt}`, '_blank');
+  };
+}
+[sVal, sEnt, sPraz, sTax].forEach(el => el.addEventListener('input', simular));
+simular();
+
+/* ---------- CARROSSEL DE AVALIAÇÕES ---------- */
+const slides = $$('.review-slide');
+const dotsWrap = $('#dots');
+slides.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.addEventListener('click', () => goTo(i));
+  dotsWrap.appendChild(d);
+});
+let slideIdx = 0;
+function goTo(i) {
+  slides[slideIdx].classList.remove('active');
+  dotsWrap.children[slideIdx].classList.remove('active');
+  slideIdx = i;
+  slides[slideIdx].classList.add('active');
+  dotsWrap.children[slideIdx].classList.add('active');
+}
+setInterval(() => goTo((slideIdx + 1) % slides.length), 5000);
+
+/* ---------- FORMULÁRIO → WHATSAPP ---------- */
+$('#leadForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const nome = $('#nome').value.trim();
+  const tel = $('#telefone').value.trim();
+  const assunto = $('#assunto').value;
+  const msg = $('#mensagem').value.trim();
+  const texto = encodeURIComponent(
+    `Olá! Meu nome é ${nome} (${tel}).\nAssunto: ${assunto}.` + (msg ? `\nMensagem: ${msg}` : '')
+  );
+  window.open(`https://wa.me/${WHATS}?text=${texto}`, '_blank');
+  e.target.reset();
+});
+</script>
+</body>
+</html>
